@@ -1,0 +1,340 @@
+/* showmd — a document, not an IDE. Colours live here so the system
+   appearance switch is instant and the editor never reconfigures. */
+
+:root {
+  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+  --measure: 46rem;
+
+  --bg: #fbfaf8;
+  --fg: #1f2024;
+  --fg-soft: #5c5f68;
+  --syntax: #b6b3ac;
+  --rule: #e2ded6;
+  --accent: #1f6f8b;
+  --caret: #1f2024;
+  --selection: #cfe3ea;
+  --panel: #f2efe9;
+  --match: #f6e6a8;
+  --match-active: #eccf5c;
+  --code-bg: #f2efe9;
+  --quote-bar: #dcd7cd;
+  --shadow: rgba(31, 32, 36, 0.16);
+
+  --tok-comment: #9a968c;
+  --tok-keyword: #8a3d6e;
+  --tok-string: #3f7a4a;
+  --tok-literal: #9a5518;
+  --tok-type: #1f6f8b;
+  --tok-fn: #3a5cab;
+  --tok-property: #6a5aa0;
+  --tok-punct: #7d7a72;
+  --tok-tag: #a2453b;
+  --tok-invalid: #c0392b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16171a;
+    --fg: #e6e4df;
+    --fg-soft: #9b9a94;
+    --syntax: #56585f;
+    --rule: #2c2e33;
+    --accent: #6fb6cf;
+    --caret: #e6e4df;
+    --selection: #2c4551;
+    --panel: #1e2024;
+    --match: #4a411f;
+    --match-active: #7a6a2a;
+    --code-bg: #1e2024;
+    --quote-bar: #3a3d44;
+    --shadow: rgba(0, 0, 0, 0.5);
+
+    --tok-comment: #6f716f;
+    --tok-keyword: #d68bb5;
+    --tok-string: #8fc79a;
+    --tok-literal: #e0a06a;
+    --tok-type: #6fb6cf;
+    --tok-fn: #8fa8e8;
+    --tok-property: #b3a4e6;
+    --tok-punct: #8b8d93;
+    --tok-tag: #e0897c;
+    --tok-invalid: #f0736a;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  overflow: hidden;
+}
+
+#editor {
+  height: 100%;
+}
+
+/* ---------- markdown rendering ---------- */
+
+.md-h1,
+.md-h2,
+.md-h3,
+.md-h4,
+.md-h5,
+.md-h6 {
+  font-weight: 680;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.md-h1 {
+  font-size: 1.95em;
+  letter-spacing: -0.025em;
+}
+.md-h2 {
+  font-size: 1.55em;
+  letter-spacing: -0.02em;
+}
+.md-h3 {
+  font-size: 1.28em;
+}
+.md-h4 {
+  font-size: 1.12em;
+}
+.md-h5 {
+  font-size: 1em;
+}
+.md-h6 {
+  font-size: 0.94em;
+  color: var(--fg-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.md-strong {
+  font-weight: 680;
+}
+.md-em {
+  font-style: italic;
+}
+.md-strike {
+  text-decoration: line-through;
+  color: var(--fg-soft);
+}
+
+.md-link {
+  color: var(--accent);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.md-url {
+  color: var(--accent);
+}
+
+.md-mono {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+.md-quote {
+  color: var(--fg-soft);
+}
+
+/* Backticks are concealed, so the tint is what marks this as code. */
+.cm-md-inline-code {
+  background: var(--code-bg);
+  border-radius: 0.25em;
+  padding: 0.1em 0.28em;
+}
+
+/* Syntax that is showing because the caret is in it — present, not loud. */
+.md-syntax,
+.cm-md-dim {
+  color: var(--syntax);
+  font-weight: 400;
+}
+
+.cm-md-bullet {
+  color: var(--fg-soft);
+}
+
+/* The blank source lines around a rule already supply the breathing room. */
+.cm-md-rule {
+  display: block;
+  height: 0;
+  border-top: 1px solid var(--rule);
+  margin: 0.6em 0 0;
+}
+
+.cm-md-task {
+  appearance: none;
+  width: 0.95em;
+  height: 0.95em;
+  margin: 0 0.15em 0 0;
+  border: 1.5px solid var(--syntax);
+  border-radius: 0.22em;
+  vertical-align: -0.12em;
+  cursor: pointer;
+}
+
+.cm-md-task:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.cm-md-task:checked::after {
+  content: "";
+  display: block;
+  width: 0.28em;
+  height: 0.5em;
+  margin: 0.03em auto 0;
+  border: solid #fff;
+  border-width: 0 1.6px 1.6px 0;
+  transform: rotate(42deg);
+}
+
+.cm-md-quote-line {
+  border-left: 3px solid var(--quote-bar);
+  padding-left: 0.85em;
+}
+
+.cm-md-code-line {
+  background: var(--code-bg);
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: 0 0.85em;
+}
+
+.cm-md-table-line {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+}
+
+/* ---------- code block tokens ---------- */
+
+.tok-comment {
+  color: var(--tok-comment);
+  font-style: italic;
+}
+.tok-keyword {
+  color: var(--tok-keyword);
+}
+.tok-string {
+  color: var(--tok-string);
+}
+.tok-literal {
+  color: var(--tok-literal);
+}
+.tok-type {
+  color: var(--tok-type);
+}
+.tok-fn {
+  color: var(--tok-fn);
+}
+.tok-property {
+  color: var(--tok-property);
+}
+.tok-punct {
+  color: var(--tok-punct);
+}
+.tok-tag {
+  color: var(--tok-tag);
+}
+.tok-invalid {
+  color: var(--tok-invalid);
+  text-decoration: underline wavy;
+}
+
+/* ---------- chrome ---------- */
+
+#banner {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translateX(-50%);
+  max-width: min(32rem, calc(100vw - 2.5rem));
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--rule);
+  border-radius: 0.5rem;
+  background: var(--panel);
+  color: var(--fg-soft);
+  font-size: 12.5px;
+  box-shadow: 0 6px 24px var(--shadow);
+}
+
+#banner[hidden] {
+  display: none;
+}
+
+.prompt {
+  max-width: 24rem;
+  padding: 1.25rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: var(--panel);
+  color: var(--fg);
+  font-family: var(--font-body);
+  box-shadow: 0 18px 50px var(--shadow);
+}
+
+.prompt::backdrop {
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.prompt-title {
+  margin: 0 0 0.4rem;
+  font-size: 13.5px;
+  font-weight: 620;
+}
+
+.prompt-body {
+  margin: 0 0 1.1rem;
+  font-size: 12.5px;
+  color: var(--fg-soft);
+}
+
+.prompt-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.prompt-actions .spacer {
+  flex: 1;
+}
+
+.prompt button {
+  padding: 0.35rem 0.85rem;
+  border-radius: 0.4rem;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.prompt button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.prompt button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}

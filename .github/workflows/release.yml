@@ -1,0 +1,74 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          # A universal build needs both slices present or cargo errors out.
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: npm ci
+
+      - name: Build universal app
+        run: npx tauri build --target universal-apple-darwin
+        env:
+          # Signing and notarization activate only when these secrets exist;
+          # without them the bundle ships ad-hoc signed.
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - name: Package tarball for Homebrew
+        id: package
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          BUNDLE=src-tauri/target/universal-apple-darwin/release/bundle/macos
+          NAME="showmd-${VERSION}-universal.app.tar.gz"
+          tar -C "$BUNDLE" -czf "$NAME" showmd.app
+          SHA=$(shasum -a 256 "$NAME" | cut -d' ' -f1)
+          SIZE=$(du -h "$NAME" | cut -f1)
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Homebrew cask values"
+            echo '```'
+            echo "version \"$VERSION\""
+            echo "sha256 \"$SHA\""
+            echo '```'
+            echo "Tarball: $SIZE"
+            echo "App bundle: $(du -sh "$BUNDLE/showmd.app" | cut -f1)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.package.outputs.name }}
+          generate_release_notes: true
+          body: |
+            `sha256` for the Homebrew cask: `${{ steps.package.outputs.sha }}`

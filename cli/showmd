@@ -1,0 +1,30 @@
+#!/bin/bash
+# showmd CLI launcher. Lives inside showmd.app/Contents/Resources/ and is
+# symlinked onto PATH by the Homebrew cask.
+#
+# Files are handed over with `open -a`, which sends an odoc Apple Event: macOS
+# routes it to the already-running instance or launches a new one, and either
+# way the command returns immediately instead of holding the terminal.
+set -euo pipefail
+
+APP="$(cd "$(dirname "$(readlink "$0" || echo "$0")")/../.." && pwd)"
+
+if [ "$#" -eq 0 ]; then
+  exec open "$APP"
+fi
+
+args=()
+for f in "$@"; do
+  case "$f" in
+    -h|--help)
+      echo "usage: showmd [file.md ...]"
+      exit 0
+      ;;
+  esac
+  # A path that does not exist yet becomes a new document at that location.
+  [ -e "$f" ] || : >"$f"
+  dir="$(cd "$(dirname "$f")" && pwd)"
+  args+=("$dir/$(basename "$f")")
+done
+
+exec open -a "$APP" "${args[@]}"
