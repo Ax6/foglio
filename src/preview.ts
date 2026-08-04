@@ -21,7 +21,6 @@ const view = createEditor({
   parent: document.getElementById("editor")!,
   doc: await pick(),
   docPath: () => "/fixtures/kitchen-sink.md",
-  appKeymap: [],
   onChange: () => {},
 });
 

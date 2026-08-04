@@ -51,16 +51,24 @@ is why document size barely affects typing cost.
 Deliberately out of scope for v1: vaults, a sidebar, tabs, a settings UI, image
 rendering, LaTeX math, and Mermaid diagrams.
 
-## Keys
+## Menu and keys
+
+The File menu carries New Window, Open File…, Save, Save As… and Close. New and
+Open are handled in Rust; Save is forwarded to the focused window, which is the
+only place the buffer lives.
 
 | Key | Action |
 | --- | --- |
-| `Cmd-S` | Save |
-| `Cmd-Shift-S` | Save As |
-| `Cmd-O` | Open |
 | `Cmd-N` | New window |
+| `Cmd-O` | Open file… |
+| `Cmd-S` | Save |
+| `Cmd-Shift-S` | Save As… |
 | `Cmd-F` | Find |
 | `Cmd-W` | Close (prompts if unsaved) |
+
+These are native menu accelerators rather than editor keybindings — macOS
+resolves them before the webview sees the keystroke, so they work regardless of
+what has focus inside the window.
 
 Tables render as aligned monospace text rather than as laid-out tables; editing
 them stays plain-text simple. Images are left as source text.

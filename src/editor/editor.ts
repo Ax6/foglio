@@ -12,7 +12,6 @@ import {
   highlightSpecialChars,
   keymap,
   rectangularSelection,
-  type KeyBinding,
 } from "@codemirror/view";
 
 import { linkClicks } from "./links";
@@ -24,7 +23,6 @@ export interface EditorOptions {
   doc: string;
   /** Read lazily so link resolution follows Save As. */
   docPath: () => string | null;
-  appKeymap: readonly KeyBinding[];
   onChange: () => void;
 }
 
@@ -52,9 +50,9 @@ export function createEditor(options: EditorOptions): EditorView {
     editorTheme,
     linkClicks(options.docPath),
 
-    // App bindings win over the editor defaults.
+    // Save/Open/New are native menu accelerators, which macOS resolves before
+    // the webview sees the key, so they are deliberately absent here.
     keymap.of([
-      ...options.appKeymap,
       ...searchKeymap,
       ...historyKeymap,
       ...defaultKeymap,

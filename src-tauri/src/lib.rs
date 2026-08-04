@@ -1,6 +1,7 @@
 mod commands;
 mod geometry;
 mod macos;
+mod menu;
 mod state;
 mod windows;
 
@@ -40,6 +41,8 @@ pub fn run() {
     let app = builder
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
+        .menu(menu::build)
+        .on_menu_event(|app, event| menu::handle(app, event.id().as_ref()))
         .manage(AppState::default())
         .invoke_handler(tauri::generate_handler![
             commands::bootstrap,
@@ -48,7 +51,6 @@ pub fn run() {
             commands::save_file,
             commands::set_dirty,
             commands::open_path,
-            commands::new_window,
             commands::stat_mtime,
             commands::force_close,
         ])

@@ -26,8 +26,6 @@ export const setDirty = (dirty: boolean) => invoke<void>("set_dirty", { dirty })
 
 export const openPath = (path: string) => invoke<void>("open_path", { path });
 
-export const newWindow = () => invoke<void>("new_window");
-
 export const statMtime = (path: string) => invoke<number | null>("stat_mtime", { path });
 
 export const forceClose = () => invoke<void>("force_close");

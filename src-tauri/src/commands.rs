@@ -123,11 +123,6 @@ pub fn open_path(app: AppHandle, path: String) -> Result<(), String> {
     windows::open_path(&app, PathBuf::from(path))
 }
 
-#[tauri::command]
-pub fn new_window(app: AppHandle) -> Result<(), String> {
-    windows::create_window(&app, None).map(|_| ())
-}
-
 /// Cheap external-change check, run when a window regains focus.
 #[tauri::command]
 pub fn stat_mtime(path: String) -> Option<u64> {

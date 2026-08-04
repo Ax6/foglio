@@ -1,8 +1,8 @@
 import { Transaction } from "@codemirror/state";
-import type { EditorView, KeyBinding } from "@codemirror/view";
+import type { EditorView } from "@codemirror/view";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
+import { save as saveDialog } from "@tauri-apps/plugin-dialog";
 
 import { createEditor } from "./editor/editor";
 import * as ipc from "./ipc";
@@ -80,21 +80,6 @@ async function save(saveAs = false): Promise<boolean> {
   }
 }
 
-async function openViaDialog() {
-  const picked = await openDialog({
-    multiple: false,
-    filters: [{ name: "Markdown", extensions: MARKDOWN_EXTENSIONS }],
-  });
-  if (typeof picked === "string") await ipc.openPath(picked);
-}
-
-const appKeymap: KeyBinding[] = [
-  { key: "Mod-s", preventDefault: true, run: () => (void save(), true) },
-  { key: "Mod-Shift-s", preventDefault: true, run: () => (void save(true), true) },
-  { key: "Mod-o", preventDefault: true, run: () => (void openViaDialog(), true) },
-  { key: "Mod-n", preventDefault: true, run: () => (void ipc.newWindow(), true) },
-];
-
 /** Re-read on focus: cheap enough to skip a filesystem watcher in v1. */
 async function checkExternalChange() {
   if (!docPath) return;
@@ -120,12 +105,17 @@ async function main() {
     parent: document.getElementById("editor")!,
     doc: doc.content,
     docPath: () => docPath,
-    appKeymap,
     onChange: scheduleDirtyCheck,
   });
   view.focus();
 
   await win.listen<ipc.Doc>("showmd://open", (event) => load(event.payload));
+
+  // File > Save / Save As. New and Open are handled entirely in Rust.
+  await win.listen<string>("showmd://menu", (event) => {
+    if (event.payload === "save") void save();
+    else if (event.payload === "save_as") void save(true);
+  });
 
   await win.onCloseRequested(async (event) => {
     if (!isDirty) return;
