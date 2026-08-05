@@ -53,13 +53,43 @@ jobs:
         id: signing
         env:
           CERT: ${{ secrets.APPLE_CERTIFICATE }}
+          CERT_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
         run: |
-          if [ -n "$CERT" ]; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
+          set -uo pipefail
+          if [ -z "${CERT:-}" ]; then
             echo "enabled=false" >> "$GITHUB_OUTPUT"
             echo "::notice::No Apple certificate configured — building unsigned."
+            exit 0
           fi
+
+          # Validate before the build: codesign runs at the *end* of bundling,
+          # so a bad secret otherwise wastes a full compile before failing.
+          if ! printf '%s' "$CERT" | tr -d '\n\r' | base64 -d > cert.p12 2>/dev/null; then
+            echo "::error::APPLE_CERTIFICATE is not valid base64. Re-set it with: base64 -i cert.p12 | tr -d '\\n' | gh secret set APPLE_CERTIFICATE --repo Ax6/showmd"
+            exit 1
+          fi
+
+          # PKCS#12 is DER-encoded and always starts with an 0x3082 SEQUENCE.
+          # Anything else means a .cer, a CSR, or a PEM was exported by mistake.
+          MAGIC=$(head -c2 cert.p12 | xxd -p)
+          if [ "$MAGIC" != "3082" ]; then
+            echo "::error::APPLE_CERTIFICATE decodes to something that is not a PKCS#12 (.p12) file. Export the certificate from Keychain Access → My Certificates → Export as .p12 — not the .cer from the developer portal."
+            rm -f cert.p12
+            exit 1
+          fi
+          rm -f cert.p12
+
+          if [ -z "${CERT_PASSWORD:-}" ]; then
+            echo "::error::APPLE_CERTIFICATE_PASSWORD is not set. Re-export the .p12 with a password and store it in that secret."
+            exit 1
+          fi
+          if [ -z "${IDENTITY:-}" ]; then
+            echo "::error::APPLE_SIGNING_IDENTITY is not set. Use the exact string from: security find-identity -v -p codesigning"
+            exit 1
+          fi
+
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
 
       - name: Build universal app (signed)
         if: steps.signing.outputs.enabled == 'true'
