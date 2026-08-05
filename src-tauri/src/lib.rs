@@ -16,7 +16,7 @@ use state::AppState;
 /// leaves an invisible window and no explanation.
 fn report(result: Result<(), String>) {
     if let Err(message) = result {
-        eprintln!("showmd: {message}");
+        eprintln!("foglio: {message}");
     }
 }
 
@@ -64,7 +64,7 @@ pub fn run() {
             Ok(())
         })
         .build(tauri::generate_context!())
-        .expect("failed to build showmd");
+        .expect("failed to build foglio");
 
     app.run(|app, event| match event {
         // Finder double-click, dock drop and `open -a` all arrive here — never

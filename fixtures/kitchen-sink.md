@@ -1,4 +1,4 @@
-# showmd kitchen sink
+# foglio kitchen sink
 
 A fixture that exercises every element the v1 renderer handles. Put the caret
 on any line to see its raw markdown reappear.

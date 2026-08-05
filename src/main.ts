@@ -109,10 +109,10 @@ async function main() {
   });
   view.focus();
 
-  await win.listen<ipc.Doc>("showmd://open", (event) => load(event.payload));
+  await win.listen<ipc.Doc>("foglio://open", (event) => load(event.payload));
 
   // File > Save / Save As. New and Open are handled entirely in Rust.
-  await win.listen<string>("showmd://menu", (event) => {
+  await win.listen<string>("foglio://menu", (event) => {
     if (event.payload === "save") void save();
     else if (event.payload === "save_as") void save(true);
   });
@@ -144,7 +144,7 @@ async function main() {
 // partly failed — otherwise there is nothing on screen to report the problem.
 main()
   .catch((error) => {
-    document.getElementById("editor")!.textContent = `showmd failed to start: ${error}`;
+    document.getElementById("editor")!.textContent = `foglio failed to start: ${error}`;
   })
   .finally(() => {
     void ipc.ready();

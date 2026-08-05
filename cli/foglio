@@ -1,5 +1,5 @@
 #!/bin/bash
-# showmd CLI launcher. Lives inside showmd.app/Contents/Resources/ and is
+# foglio CLI launcher. Lives inside Foglio MD.app/Contents/Resources/ and is
 # symlinked onto PATH by the Homebrew cask.
 #
 # Files are handed over with `open -a`, which sends an odoc Apple Event: macOS
@@ -17,7 +17,7 @@ args=()
 for f in "$@"; do
   case "$f" in
     -h|--help)
-      echo "usage: showmd [file.md ...]"
+      echo "usage: foglio [file.md ...]"
       exit 0
       ;;
   esac

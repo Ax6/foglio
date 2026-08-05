@@ -113,12 +113,12 @@ jobs:
         run: |
           set -euo pipefail
           BUNDLE=src-tauri/target/universal-apple-darwin/release/bundle/macos
-          NAME="showmd-${VERSION}-universal.app.tar.gz"
-          tar -C "$BUNDLE" -czf "$NAME" showmd.app
+          NAME="foglio-${VERSION}-universal.app.tar.gz"
+          tar -C "$BUNDLE" -czf "$NAME" "Foglio MD.app"
           SHA=$(shasum -a 256 "$NAME" | cut -d' ' -f1)
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
-          ARCHS=$(lipo -archs "$BUNDLE/showmd.app/Contents/MacOS/showmd")
+          ARCHS=$(lipo -archs "$BUNDLE/Foglio MD.app/Contents/MacOS/foglio")
           {
             echo "### Cask values for Ax6/homebrew-tap"
             echo '```ruby'
@@ -129,7 +129,7 @@ jobs:
             echo "| | |"
             echo "| --- | --- |"
             echo "| Architectures | \`$ARCHS\` |"
-            echo "| App bundle | $(du -sh "$BUNDLE/showmd.app" | cut -f1) |"
+            echo "| App bundle | $(du -sh "$BUNDLE/Foglio MD.app" | cut -f1) |"
             echo "| Tarball | $(du -h "$NAME" | cut -f1) |"
           } >> "$GITHUB_STEP_SUMMARY"
           # A universal build that silently lost a slice would break Intel users.
@@ -141,7 +141,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: showmd-universal
+          name: foglio-universal
           path: ${{ steps.package.outputs.name }}
           if-no-files-found: error
 
@@ -155,7 +155,7 @@ jobs:
             Install:
 
             ```bash
-            brew install Ax6/tap/showmd
+            brew install Ax6/tap/foglio
             ```
 
             Cask `sha256` for this build: `${{ steps.package.outputs.sha }}`

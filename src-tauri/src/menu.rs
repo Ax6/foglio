@@ -7,7 +7,7 @@ use tauri::{AppHandle, Emitter, Manager, Runtime};
 
 use crate::windows;
 
-pub const MENU_EVENT: &str = "showmd://menu";
+pub const MENU_EVENT: &str = "foglio://menu";
 
 pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
     let new_window = MenuItem::with_id(app, "new", "New Window", true, Some("CmdOrCtrl+N"))?;
@@ -16,12 +16,12 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
     let save_as = MenuItem::with_id(app, "save_as", "Save As…", true, Some("CmdOrCtrl+Shift+S"))?;
 
     let about = AboutMetadata {
-        name: Some("showmd".into()),
+        name: Some("Foglio MD".into()),
         version: Some(app.package_info().version.to_string()),
         ..Default::default()
     };
 
-    let app_menu = SubmenuBuilder::new(app, "showmd")
+    let app_menu = SubmenuBuilder::new(app, "Foglio MD")
         .about(Some(about))
         .separator()
         .services()
@@ -69,7 +69,7 @@ pub fn handle(app: &AppHandle, id: &str) {
     match id {
         "new" => {
             if let Err(message) = windows::create_window(app, None) {
-                eprintln!("showmd: {message}");
+                eprintln!("foglio: {message}");
             }
         }
         "open" => pick_file(app),
@@ -111,7 +111,7 @@ fn pick_file(app: &AppHandle) {
             let inner = handle.clone();
             let _ = handle.run_on_main_thread(move || {
                 if let Err(message) = windows::open_path(&inner, path) {
-                    eprintln!("showmd: {message}");
+                    eprintln!("foglio: {message}");
                 }
             });
         });

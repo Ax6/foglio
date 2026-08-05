@@ -76,7 +76,7 @@ pub fn save_file(
     let dir = path.parent().ok_or("file has no parent directory")?;
 
     let tmp = dir.join(format!(
-        ".{}.showmd-tmp",
+        ".{}.foglio-tmp",
         path.file_name().unwrap_or_default().to_string_lossy()
     ));
 

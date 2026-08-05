@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Permissions for showmd document windows",
+  "description": "Permissions for foglio document windows",
   "windows": ["main", "doc-*"],
   "permissions": [
     "core:default",

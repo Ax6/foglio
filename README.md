@@ -1,4 +1,4 @@
-# showmd
+# Foglio MD
 
 A lightweight, fast Markdown reader and editor for macOS. Opens a file like a
 little document — one file, one window, nothing else.
@@ -7,20 +7,20 @@ Editing works the way Obsidian's live preview does: Markdown renders in place,
 and the raw syntax reappears only on the element your caret is in.
 
 ```bash
-showmd notes.md
+foglio notes.md
 ```
 
 ## Install
 
 ```bash
-brew install Ax6/tap/showmd
+brew install Ax6/tap/foglio
 ```
 
-Or double-click any `.md` file in Finder once showmd is set as the handler.
+Or double-click any `.md` file in Finder once Foglio MD is set as the handler.
 
 ## Why it's small and quick
 
-showmd is a [Tauri 2](https://tauri.app) shell around
+Foglio MD is a [Tauri 2](https://tauri.app) shell around
 [CodeMirror 6](https://codemirror.net), rendering in the system WebKit view. No
 bundled browser engine, so the whole app is a fraction of the size of an
 Electron equivalent, and windows open hidden and are revealed only once the
@@ -44,7 +44,7 @@ is why document size barely affects typing cost.
   checkboxes, tables, links, blockquotes, horizontal rules
 - Fenced code blocks with syntax highlighting, loaded on demand per language
 - Clickable task checkboxes
-- Cmd-click to follow a link; relative `.md` links open in a new showmd window
+- Cmd-click to follow a link; relative `.md` links open in a new Foglio MD window
 - Follows the system light/dark appearance
 - Reloads automatically when the file changes on disk and you have no unsaved edits
 
@@ -94,7 +94,7 @@ then open `http://localhost:1420/preview.html`.
 For a perf check, generate a large fixture and append `?large` to that URL:
 
 ```bash
-python3 -c "b=open('fixtures/kitchen-sink.md').read(); open('fixtures/large.md','w').write('\n\n'.join(b.replace('# showmd kitchen sink', f'# Section {i}') for i in range(1543)))"
+python3 -c "b=open('fixtures/kitchen-sink.md').read(); open('fixtures/large.md','w').write('\n\n'.join(b.replace('# foglio kitchen sink', f'# Section {i}') for i in range(1543)))"
 ```
 
 ### Layout
@@ -106,7 +106,7 @@ python3 -c "b=open('fixtures/kitchen-sink.md').read(); open('fixtures/large.md',
 | `src/styles.css` | All colours and typography, light and dark |
 | `src-tauri/src/windows.rs` | The single funnel all four file-open routes lead into |
 | `src-tauri/src/lib.rs` | Plugins, run loop, Apple Event handling |
-| `packaging/showmd.rb` | Homebrew cask, copied into the tap on release |
+| `packaging/foglio.rb` | Homebrew cask, copied into the tap on release |
 
 ### Releasing
 
@@ -114,13 +114,13 @@ python3 -c "b=open('fixtures/kitchen-sink.md').read(); open('fixtures/large.md',
 fails the build.
 
 1. Bump the version there, commit, push.
-2. `git tag -a vX.Y.Z -m "showmd X.Y.Z" && git push origin vX.Y.Z`
+2. `git tag -a vX.Y.Z -m "foglio X.Y.Z" && git push origin vX.Y.Z`
 3. The workflow builds a universal binary, checks with `lipo` that both slices
-   are present, publishes `showmd-X.Y.Z-universal.app.tar.gz`, and prints the
+   are present, publishes `foglio-X.Y.Z-universal.app.tar.gz`, and prints the
    `version` and `sha256` in its job summary.
-4. Paste those two values into `Casks/showmd.rb` in
+4. Paste those two values into `Casks/foglio.rb` in
    [Ax6/homebrew-tap](https://github.com/Ax6/homebrew-tap) and push. Keep
-   `packaging/showmd.rb` here in sync as the template.
+   `packaging/foglio.rb` here in sync as the template.
 
 To exercise the pipeline without cutting a release, run the workflow manually —
 it builds and uploads an artifact but publishes nothing.

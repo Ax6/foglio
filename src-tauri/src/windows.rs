@@ -34,7 +34,7 @@ pub fn mtime_ms(path: &Path) -> Option<u64> {
 }
 
 /// A path that does not exist yet is still a valid target — it becomes an
-/// empty buffer that saves to that location, so `showmd notes.md` works.
+/// empty buffer that saves to that location, so `foglio notes.md` works.
 pub fn read_or_empty(path: &Path) -> Result<String, String> {
     match std::fs::read_to_string(path) {
         Ok(content) => Ok(content),
@@ -102,7 +102,7 @@ pub fn open_path(app: &AppHandle, path: PathBuf) -> Result<(), String> {
             let _ = win.set_title(&title_for(Some(&path)));
             app.emit_to(
                 win.label(),
-                "showmd://open",
+                "foglio://open",
                 serde_json::json!({
                     "path": path.to_string_lossy(),
                     "content": content,

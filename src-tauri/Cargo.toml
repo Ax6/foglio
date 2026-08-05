@@ -1,12 +1,12 @@
 [package]
-name = "showmd"
-version = "0.1.0"
+name = "foglio"
+version = "0.2.0"
 description = "Lightweight, ultra-fast Markdown reader and editor"
 authors = ["Aaron Russo"]
 edition = "2021"
 
 [lib]
-name = "showmd_lib"
+name = "foglio_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

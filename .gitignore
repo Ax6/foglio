@@ -24,7 +24,7 @@ dist-ssr
 *.sw?
 
 # Save-in-progress temp files
-.*.showmd-tmp
+.*.foglio-tmp
 fixtures/large.md
 
 # Local agent/editor tooling config
