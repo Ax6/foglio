@@ -4,6 +4,7 @@ import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { save as saveDialog } from "@tauri-apps/plugin-dialog";
 
+import { applyMode, type Mode } from "./appearance";
 import { createEditor } from "./editor/editor";
 import * as ipc from "./ipc";
 import { askToSave, showBanner } from "./prompt";
@@ -96,6 +97,10 @@ async function checkExternalChange() {
 }
 
 async function main() {
+  // Before anything is drawn — the window stays hidden until `ready`, so
+  // resolving the palette here means it is never seen in the wrong appearance.
+  applyMode((await ipc.appearanceMode()) as Mode);
+
   const doc = await ipc.bootstrap();
   docPath = doc.path;
   savedText = doc.content;
@@ -110,6 +115,8 @@ async function main() {
   view.focus();
 
   await win.listen<ipc.Doc>("foglio://open", (event) => load(event.payload));
+
+  await win.listen<string>("foglio://theme", (event) => applyMode(event.payload as Mode));
 
   // File > Save / Save As. New and Open are handled entirely in Rust.
   await win.listen<string>("foglio://menu", (event) => {

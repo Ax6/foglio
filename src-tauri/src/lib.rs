@@ -1,3 +1,4 @@
+mod appearance;
 mod commands;
 mod geometry;
 mod macos;
@@ -41,11 +42,12 @@ pub fn run() {
     let app = builder
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
-        .menu(menu::build)
+        .menu(|app| menu::build(app, appearance::Mode::default()))
         .on_menu_event(|app, event| menu::handle(app, event.id().as_ref()))
         .manage(AppState::default())
         .invoke_handler(tauri::generate_handler![
             commands::bootstrap,
+            commands::appearance_mode,
             commands::ready,
             commands::read_file,
             commands::save_file,
@@ -57,6 +59,10 @@ pub fn run() {
         .setup(|app| {
             let state = app.state::<AppState>();
             *state.last_size.lock().unwrap() = geometry::load(app.handle());
+            // Reading the stored appearance needs the path resolver, which only
+            // exists by the time setup runs — hence correcting the menu here
+            // rather than while building it.
+            menu::sync_checks(app.handle(), appearance::load(app.handle()));
 
             let args: Vec<String> = std::env::args().collect();
             let paths = windows::paths_from_args(&args, None);

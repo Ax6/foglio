@@ -1,10 +1,21 @@
-/* foglio — a document, not an IDE. Colours live here so the system
-   appearance switch is instant and the editor never reconfigures. */
+/* foglio — a document, not an IDE. Colours live here so switching appearance is
+   instant and the editor never reconfigures.
 
-:root {
+   The palette is keyed on data-theme, which the frontend always sets to a
+   concrete "light" or "dark" before the window is revealed — following the
+   system when that is the chosen mode, or overriding it when it is not. Keying
+   on the attribute rather than a prefers-color-scheme media query means the dark
+   palette is written once instead of twice. */
+
+:root,
+:root[data-theme="light"] {
   --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
   --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
-  --measure: 46rem;
+  /* ~80 characters at the body size. The comfortable range for prose is
+     45–75, but Markdown source is conventionally hard-wrapped at 80, and a
+     measure below that makes every such line soft-wrap with a short orphan
+     beneath it — worse than sitting slightly wide. */
+  --measure: 36rem;
 
   --bg: #fbfaf8;
   --fg: #1f2024;
@@ -33,34 +44,32 @@
   --tok-invalid: #c0392b;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #16171a;
-    --fg: #e6e4df;
-    --fg-soft: #9b9a94;
-    --syntax: #56585f;
-    --rule: #2c2e33;
-    --accent: #6fb6cf;
-    --caret: #e6e4df;
-    --selection: #2c4551;
-    --panel: #1e2024;
-    --match: #4a411f;
-    --match-active: #7a6a2a;
-    --code-bg: #1e2024;
-    --quote-bar: #3a3d44;
-    --shadow: rgba(0, 0, 0, 0.5);
+:root[data-theme="dark"] {
+  --bg: #16171a;
+  --fg: #e6e4df;
+  --fg-soft: #9b9a94;
+  --syntax: #56585f;
+  --rule: #2c2e33;
+  --accent: #6fb6cf;
+  --caret: #e6e4df;
+  --selection: #2c4551;
+  --panel: #1e2024;
+  --match: #4a411f;
+  --match-active: #7a6a2a;
+  --code-bg: #1e2024;
+  --quote-bar: #3a3d44;
+  --shadow: rgba(0, 0, 0, 0.5);
 
-    --tok-comment: #6f716f;
-    --tok-keyword: #d68bb5;
-    --tok-string: #8fc79a;
-    --tok-literal: #e0a06a;
-    --tok-type: #6fb6cf;
-    --tok-fn: #8fa8e8;
-    --tok-property: #b3a4e6;
-    --tok-punct: #8b8d93;
-    --tok-tag: #e0897c;
-    --tok-invalid: #f0736a;
-  }
+  --tok-comment: #6f716f;
+  --tok-keyword: #d68bb5;
+  --tok-string: #8fc79a;
+  --tok-literal: #e0a06a;
+  --tok-type: #6fb6cf;
+  --tok-fn: #8fa8e8;
+  --tok-property: #b3a4e6;
+  --tok-punct: #8b8d93;
+  --tok-tag: #e0897c;
+  --tok-invalid: #f0736a;
 }
 
 * {

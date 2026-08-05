@@ -7,6 +7,7 @@
  */
 import fixture from "../fixtures/kitchen-sink.md?raw";
 
+import { applyMode } from "./appearance";
 import { createEditor } from "./editor/editor";
 
 const params = new URLSearchParams(location.search);
@@ -16,6 +17,8 @@ async function pick(): Promise<string> {
   const response = await fetch("/fixtures/large.md");
   return response.ok ? response.text() : fixture;
 }
+
+applyMode("system");
 
 const view = createEditor({
   parent: document.getElementById("editor")!,

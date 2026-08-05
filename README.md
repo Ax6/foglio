@@ -45,7 +45,7 @@ is why document size barely affects typing cost.
 - Fenced code blocks with syntax highlighting, loaded on demand per language
 - Clickable task checkboxes
 - Cmd-click to follow a link; relative `.md` links open in a new Foglio MD window
-- Follows the system light/dark appearance
+- Follows the system light/dark appearance, or a fixed one chosen in the View menu
 - Reloads automatically when the file changes on disk and you have no unsaved edits
 
 Deliberately out of scope for v1: vaults, a sidebar, tabs, a settings UI, image
@@ -55,7 +55,8 @@ rendering, LaTeX math, and Mermaid diagrams.
 
 The File menu carries New Window, Open File…, Save, Save As… and Close. New and
 Open are handled in Rust; Save is forwarded to the focused window, which is the
-only place the buffer lives.
+only place the buffer lives. The View menu chooses the appearance — Match System,
+Light or Dark — which is remembered and applies to every open window.
 
 | Key | Action |
 | --- | --- |
@@ -111,7 +112,8 @@ python3 -c "b=open('fixtures/kitchen-sink.md').read(); open('fixtures/large.md',
 | --- | --- |
 | `src/editor/live-preview.ts` | Conceals and reveals Markdown syntax — the core of the editing feel |
 | `src/editor/theme.ts` | Highlight tags mapped to CSS classes |
-| `src/styles.css` | All colours and typography, light and dark |
+| `src/styles.css` | All colours and typography, keyed on `data-theme` |
+| `src/appearance.ts` | Resolves the chosen mode, following the system when asked to |
 | `src-tauri/src/windows.rs` | The single funnel all four file-open routes lead into |
 | `src-tauri/src/lib.rs` | Plugins, run loop, Apple Event handling |
 | `packaging/foglio.rb` | Homebrew cask, copied into the tap on release |

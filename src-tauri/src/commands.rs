@@ -134,3 +134,9 @@ pub fn stat_mtime(path: String) -> Option<u64> {
 pub fn force_close(window: WebviewWindow) {
     let _ = window.destroy();
 }
+
+/// The frontend resolves "system" itself, so it only needs the stored choice.
+#[tauri::command]
+pub fn appearance_mode(app: AppHandle) -> String {
+    crate::appearance::load(&app).as_str().to_string()
+}
