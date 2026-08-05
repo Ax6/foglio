@@ -91,6 +91,36 @@ jobs:
 
           echo "enabled=true" >> "$GITHUB_OUTPUT"
 
+      # Notarization fails with an opaque 403 when the team ID is wrong, and it
+      # only fails *after* a full build. The certificate carries the real team ID
+      # in its Organizational Unit, so it can be checked up front. Actions masks
+      # secret values in logs, so a team ID that prints in the clear here is
+      # by definition not the one stored in APPLE_TEAM_ID.
+      - name: Cross-check team ID against the certificate
+        if: steps.signing.outputs.enabled == 'true'
+        env:
+          CERT: ${{ secrets.APPLE_CERTIFICATE }}
+          CERT_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -uo pipefail
+          printf '%s' "$CERT" | tr -d '\n\r' | base64 -d > cert.p12
+          SUBJECT=$(openssl pkcs12 -in cert.p12 -passin env:CERT_PASSWORD -nokeys -clcerts -legacy 2>/dev/null \
+                    || openssl pkcs12 -in cert.p12 -passin env:CERT_PASSWORD -nokeys -clcerts 2>/dev/null \
+                    | openssl x509 -noout -subject 2>/dev/null)
+          rm -f cert.p12
+          CERT_TEAM=$(printf '%s' "$SUBJECT" | tr ',/' '\n\n' | sed -n 's/.*OU *= *//p' | head -1 | tr -d ' ')
+          if [ -z "$CERT_TEAM" ]; then
+            echo "::warning::Could not read the team ID out of the certificate; skipping the cross-check."
+            exit 0
+          fi
+          echo "Team ID according to the certificate: $CERT_TEAM"
+          if [ "$CERT_TEAM" != "$(printf '%s' "$TEAM_ID" | tr -d '[:space:]')" ]; then
+            echo "::error::APPLE_TEAM_ID does not match the certificate. The certificate says '$CERT_TEAM' (printed in the clear because it differs from the stored secret). Set it with: printf '%s' '$CERT_TEAM' | gh secret set APPLE_TEAM_ID --repo Ax6/showmd"
+            exit 1
+          fi
+          echo "APPLE_TEAM_ID matches the certificate."
+
       - name: Build universal app (signed)
         if: steps.signing.outputs.enabled == 'true'
         run: npx tauri build --target universal-apple-darwin
