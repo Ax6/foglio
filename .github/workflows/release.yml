@@ -115,6 +115,17 @@ jobs:
             exit 0
           fi
           echo "Team ID according to the certificate: $CERT_TEAM"
+
+          # Only a "Developer ID Application" certificate can notarize. An
+          # "Apple Development" or "Apple Distribution" cert signs fine locally
+          # and then fails at the notary service, which is confusing to debug.
+          CERT_CN=$(printf '%s' "$SUBJECT" | tr ',/' '\n\n' | sed -n 's/.*CN *= *//p' | head -1)
+          echo "Certificate type: ${CERT_CN%%:*}"
+          case "$CERT_CN" in
+            "Developer ID Application"*) ;;
+            *) echo "::error::Signing certificate is '${CERT_CN%%:*}', which cannot be notarized. Notarization requires a 'Developer ID Application' certificate — create one in Xcode → Settings → Accounts → Manage Certificates → + → Developer ID Application, then re-export the .p12."
+               exit 1 ;;
+          esac
           if [ "$CERT_TEAM" != "$(printf '%s' "$TEAM_ID" | tr -d '[:space:]')" ]; then
             echo "::error::APPLE_TEAM_ID does not match the certificate. The certificate says '$CERT_TEAM' (printed in the clear because it differs from the stored secret). Set it with: printf '%s' '$CERT_TEAM' | gh secret set APPLE_TEAM_ID --repo Ax6/showmd"
             exit 1
