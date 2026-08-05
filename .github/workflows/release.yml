@@ -3,6 +3,8 @@ name: release
 on:
   push:
     tags: ["v*"]
+  # Manual runs build and upload an artifact but never publish a release, so
+  # the pipeline can be exercised without cutting a version.
   workflow_dispatch:
 
 jobs:
@@ -30,6 +32,19 @@ jobs:
 
       - run: npm ci
 
+      # tauri.conf.json is the single source of truth for the version; a tag
+      # that disagrees with it is a mistake worth failing on.
+      - name: Resolve version
+        id: version
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "${GITHUB_REF_NAME#v}" != "$VERSION" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match tauri.conf.json version ${VERSION}"
+            exit 1
+          fi
+
       - name: Build universal app
         run: npx tauri build --target universal-apple-darwin
         env:
@@ -44,31 +59,54 @@ jobs:
 
       - name: Package tarball for Homebrew
         id: package
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
-          VERSION="${GITHUB_REF_NAME#v}"
           BUNDLE=src-tauri/target/universal-apple-darwin/release/bundle/macos
           NAME="showmd-${VERSION}-universal.app.tar.gz"
           tar -C "$BUNDLE" -czf "$NAME" showmd.app
           SHA=$(shasum -a 256 "$NAME" | cut -d' ' -f1)
-          SIZE=$(du -h "$NAME" | cut -f1)
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          ARCHS=$(lipo -archs "$BUNDLE/showmd.app/Contents/MacOS/showmd")
           {
-            echo "### Homebrew cask values"
+            echo "### Cask values for Ax6/homebrew-tap"
+            echo '```ruby'
+            echo "  version \"$VERSION\""
+            echo "  sha256 \"$SHA\""
             echo '```'
-            echo "version \"$VERSION\""
-            echo "sha256 \"$SHA\""
-            echo '```'
-            echo "Tarball: $SIZE"
-            echo "App bundle: $(du -sh "$BUNDLE/showmd.app" | cut -f1)"
+            echo ""
+            echo "| | |"
+            echo "| --- | --- |"
+            echo "| Architectures | \`$ARCHS\` |"
+            echo "| App bundle | $(du -sh "$BUNDLE/showmd.app" | cut -f1) |"
+            echo "| Tarball | $(du -h "$NAME" | cut -f1) |"
           } >> "$GITHUB_STEP_SUMMARY"
+          # A universal build that silently lost a slice would break Intel users.
+          case "$ARCHS" in
+            *x86_64*arm64*|*arm64*x86_64*) ;;
+            *) echo "::error::expected a universal binary, got: $ARCHS"; exit 1 ;;
+          esac
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: showmd-universal
+          path: ${{ steps.package.outputs.name }}
+          if-no-files-found: error
 
       - name: Publish release
+        if: github.ref_type == 'tag'
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ steps.package.outputs.name }}
           generate_release_notes: true
           body: |
-            `sha256` for the Homebrew cask: `${{ steps.package.outputs.sha }}`
+            Install:
+
+            ```bash
+            brew install Ax6/tap/showmd
+            ```
+
+            Cask `sha256` for this build: `${{ steps.package.outputs.sha }}`

@@ -30,7 +30,7 @@ Measured on an M-series Mac:
 
 | | |
 | --- | --- |
-| `.app` bundle | 3.4 MB single-arch, ~6.7 MB universal |
+| `.app` bundle | 3.4 MB single-arch, 7.0 MB universal (3.8 MB download) |
 | Cold start to visible window | ~535 ms |
 | Second window in a running app | ~305 ms |
 | Keystroke on a 3 MB / 155k-line file | 1.2 ms median, 3.7 ms p95 |

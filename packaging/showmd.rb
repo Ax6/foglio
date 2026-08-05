@@ -19,10 +19,9 @@ cask "showmd" do
     strategy :github_latest
   end
 
-  depends_on macos: ">= :big_sur"
+  depends_on macos: :big_sur
 
   app "showmd.app"
-
   # The shim inside the bundle uses `open -a`, so `showmd notes.md` reaches the
   # running instance through the same Apple Event path as a Finder double-click.
   binary "#{appdir}/showmd.app/Contents/Resources/showmd"
@@ -37,6 +36,13 @@ cask "showmd" do
                    sudo: false
   end
 
+  zap trash: [
+    "~/Library/Application Support/io.aaronrusso.showmd",
+    "~/Library/Caches/io.aaronrusso.showmd",
+    "~/Library/Saved Application State/io.aaronrusso.showmd.savedState",
+    "~/Library/WebKit/io.aaronrusso.showmd",
+  ]
+
   caveats <<~EOS
     showmd is not yet notarized by Apple. The install removes the quarantine
     flag for you; if macOS still refuses to open it, allow it once under
@@ -45,11 +51,4 @@ cask "showmd" do
     To make showmd the default for Markdown files, right-click any .md file in
     Finder → Get Info → Open with → showmd → Change All.
   EOS
-
-  zap trash: [
-    "~/Library/Application Support/io.aaronrusso.showmd",
-    "~/Library/Caches/io.aaronrusso.showmd",
-    "~/Library/WebKit/io.aaronrusso.showmd",
-    "~/Library/Saved Application State/io.aaronrusso.showmd.savedState",
-  ]
 end
