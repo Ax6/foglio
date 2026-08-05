@@ -218,9 +218,18 @@ body {
   padding: 0 0.85em;
 }
 
+/* Table rows opt out of the measure and out of wrapping: a wrapped row breaks
+   column alignment, because no two rows wrap at the same column. They share one
+   left edge — aligned with where prose starts — so the columns line up; letting
+   each row centre itself would stagger them, since rows differ in width. */
 .cm-md-table-line {
   font-family: var(--font-mono);
   font-size: 0.88em;
+  max-width: none;
+  width: max-content;
+  white-space: pre;
+  margin-left: max(0px, calc((100% - var(--measure)) / 2));
+  margin-right: 0;
 }
 
 /* ---------- code block tokens ---------- */

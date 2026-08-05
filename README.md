@@ -64,14 +64,22 @@ only place the buffer lives.
 | `Cmd-S` | Save |
 | `Cmd-Shift-S` | Save As… |
 | `Cmd-F` | Find |
+| `Tab` / `Shift-Tab` | Next / previous table cell (indents outside a table) |
 | `Cmd-W` | Close (prompts if unsaved) |
 
 These are native menu accelerators rather than editor keybindings — macOS
 resolves them before the webview sees the keystroke, so they work regardless of
 what has focus inside the window.
 
-Tables render as aligned monospace text rather than as laid-out tables; editing
-them stays plain-text simple. Images are left as source text.
+Tables render as aligned monospace text rather than as laid-out tables. They are
+allowed to be wider than the text measure: a table row never wraps, because no
+two rows wrap at the same column and a single wrapped row destroys the alignment
+of the whole table. Instead rows share one left edge and run off the right of the
+sheet, scrolling horizontally when they exceed the window.
+
+Cells do not have to be padded by hand. Type them loosely and the pipes are
+realigned as soon as the caret leaves the table, honouring `:---:` and `---:`
+alignment markers. Images are left as source text.
 
 ## Development
 

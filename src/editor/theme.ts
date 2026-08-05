@@ -50,15 +50,26 @@ export const editorTheme = EditorView.theme({
     fontFamily: "var(--font-body)",
     lineHeight: "1.65",
     overflowY: "auto",
-    overflowX: "hidden",
+    // Tables are allowed to be wider than the sheet, so the scroller has to be
+    // able to reach them.
+    overflowX: "auto",
   },
+  // The measure lives on the line rather than the content box. Prose lines
+  // centre themselves inside it; a table line opts out and runs as wide as it
+  // needs (see .cm-md-table-line). Constraining .cm-content instead would force
+  // tables to wrap, and a wrapped row breaks column alignment for the whole
+  // table because no two rows wrap at the same column.
   ".cm-content": {
     padding: "3rem 1.75rem 40vh",
-    maxWidth: "var(--measure)",
-    margin: "0 auto",
+    maxWidth: "none",
     caretColor: "var(--caret)",
   },
-  ".cm-line": { padding: "0" },
+  ".cm-line": {
+    padding: "0",
+    maxWidth: "var(--measure)",
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
   "&.cm-focused .cm-cursor": { borderLeftColor: "var(--caret)", borderLeftWidth: "2px" },
   ".cm-selectionBackground, ::selection": { backgroundColor: "var(--selection)" },
   "&.cm-focused .cm-selectionBackground": { backgroundColor: "var(--selection)" },
