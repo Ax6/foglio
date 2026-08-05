@@ -133,8 +133,12 @@ fails the build.
 To exercise the pipeline without cutting a release, run the workflow manually —
 it builds and uploads an artifact but publishes nothing.
 
-Builds are unsigned until an Apple Developer ID is configured. Adding the
-`APPLE_CERTIFICATE`, `APPLE_SIGNING_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD` and
-`APPLE_TEAM_ID` secrets switches the workflow onto its signed path with no
-other changes. Until then the cask strips the quarantine flag on install, which
-is what lets Gatekeeper allow the app through.
+Releases are signed with a Developer ID certificate and notarized by Apple, so
+Gatekeeper accepts them without a prompt. The workflow checks up front that the
+certificate is a `Developer ID Application` type and that its team matches
+`APPLE_TEAM_ID`; both are common misconfigurations that otherwise fail only at
+the very end of a build, as an opaque 403 from the notary service.
+
+Signing activates when the `APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`,
+`APPLE_SIGNING_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD` and `APPLE_TEAM_ID`
+secrets are present; without them the build still succeeds, unsigned.

@@ -26,16 +26,6 @@ cask "foglio" do
   # running instance through the same Apple Event path as a Finder double-click.
   binary "#{appdir}/Foglio MD.app/Contents/Resources/foglio"
 
-  # Remove once releases are signed and notarized with a Developer ID.
-  postflight do
-    system_command "/bin/chmod",
-                   args: ["+x", "#{appdir}/Foglio MD.app/Contents/Resources/foglio"],
-                   sudo: false
-    system_command "/usr/bin/xattr",
-                   args: ["-dr", "com.apple.quarantine", "#{appdir}/Foglio MD.app"],
-                   sudo: false
-  end
-
   zap trash: [
     "~/Library/Application Support/io.aaronrusso.foglio",
     "~/Library/Caches/io.aaronrusso.foglio",
@@ -44,11 +34,7 @@ cask "foglio" do
   ]
 
   caveats <<~EOS
-    foglio is not yet notarized by Apple. The install removes the quarantine
-    flag for you; if macOS still refuses to open it, allow it once under
-    System Settings → Privacy & Security → "Open Anyway".
-
-    To make foglio the default for Markdown files, right-click any .md file in
-    Finder → Get Info → Open with → foglio → Change All.
+    To make Foglio MD the default for Markdown files, right-click any .md file in
+    Finder → Get Info → Open with → Foglio MD → Change All.
   EOS
 end
