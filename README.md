@@ -110,5 +110,23 @@ python3 -c "b=open('fixtures/kitchen-sink.md').read(); open('fixtures/large.md',
 
 ### Releasing
 
-Push a `v*` tag. The workflow builds a universal binary, publishes a
-`.app.tar.gz`, and prints the `version`/`sha256` to paste into the tap's cask.
+`src-tauri/tauri.conf.json` holds the version; a tag that disagrees with it
+fails the build.
+
+1. Bump the version there, commit, push.
+2. `git tag -a vX.Y.Z -m "showmd X.Y.Z" && git push origin vX.Y.Z`
+3. The workflow builds a universal binary, checks with `lipo` that both slices
+   are present, publishes `showmd-X.Y.Z-universal.app.tar.gz`, and prints the
+   `version` and `sha256` in its job summary.
+4. Paste those two values into `Casks/showmd.rb` in
+   [Ax6/homebrew-tap](https://github.com/Ax6/homebrew-tap) and push. Keep
+   `packaging/showmd.rb` here in sync as the template.
+
+To exercise the pipeline without cutting a release, run the workflow manually —
+it builds and uploads an artifact but publishes nothing.
+
+Builds are unsigned until an Apple Developer ID is configured. Adding the
+`APPLE_CERTIFICATE`, `APPLE_SIGNING_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD` and
+`APPLE_TEAM_ID` secrets switches the workflow onto its signed path with no
+other changes. Until then the cask strips the quarantine flag on install, which
+is what lets Gatekeeper allow the app through.
