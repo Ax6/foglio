@@ -1,0 +1,37 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Concept 1: "Il Foglio" - one sheet, one fold, one sunset -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF9159"/>
+      <stop offset="0.55" stop-color="#FF5E62"/>
+      <stop offset="1" stop-color="#D63C8B"/>
+    </linearGradient>
+    <linearGradient id="sheet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#FFF1E9"/>
+    </linearGradient>
+    <linearGradient id="flap" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFE4D4"/>
+      <stop offset="1" stop-color="#F2B9C7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- macOS rounded-square container, ~80% of tile -->
+  <rect x="100" y="100" width="824" height="824" rx="184" fill="url(#bg)"/>
+
+  <!-- soft drop shadow under the sheet -->
+  <path d="M368 257 H552 L692 397 V731 Q692 767 656 767 H368 Q332 767 332 731 V293 Q332 257 368 257 Z"
+        fill="#8F1D57" opacity="0.32" transform="translate(0,20)"/>
+
+  <!-- the sheet, top-right corner clipped for the fold -->
+  <path d="M368 257 H552 L692 397 V731 Q692 767 656 767 H368 Q332 767 332 731 V293 Q332 257 368 257 Z"
+        fill="url(#sheet)"/>
+
+  <!-- the dog-ear flap -->
+  <path d="M552 257 L692 397 H588 Q552 397 552 361 Z" fill="url(#flap)"/>
+
+  <!-- three lines of "text": heading in the brand coral, body muted -->
+  <rect x="398" y="452" width="196" height="48" rx="24" fill="#FF5E62"/>
+  <rect x="398" y="556" width="228" height="30" rx="15" fill="#ECD9DF"/>
+  <rect x="398" y="620" width="162" height="30" rx="15" fill="#ECD9DF"/>
+</svg>
