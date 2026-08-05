@@ -9,10 +9,10 @@ cask "foglio" do
   version "0.2.0"
   sha256 "REPLACE_WITH_RELEASE_SHA256"
 
-  url "https://github.com/Ax6/showmd/releases/download/v#{version}/foglio-#{version}-universal.app.tar.gz"
+  url "https://github.com/Ax6/foglio/releases/download/v#{version}/foglio-#{version}-universal.app.tar.gz"
   name "Foglio MD"
   desc "Lightweight, ultra-fast Markdown reader and editor"
-  homepage "https://github.com/Ax6/showmd"
+  homepage "https://github.com/Ax6/foglio"
 
   livecheck do
     url :url
