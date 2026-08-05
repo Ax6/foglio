@@ -13,7 +13,7 @@ showmd notes.md
 ## Install
 
 ```bash
-brew install aaronrusso/tap/showmd
+brew install Ax6/tap/showmd
 ```
 
 Or double-click any `.md` file in Finder once showmd is set as the handler.

@@ -1,18 +1,18 @@
 # Homebrew cask for showmd.
 #
 # Copy this into a tap repo as Casks/showmd.rb — the tap must be named
-# `homebrew-tap` (i.e. github.com/aaronrusso/homebrew-tap) for
-# `brew install aaronrusso/tap/showmd` to resolve.
+# `homebrew-tap` (i.e. github.com/Ax6/homebrew-tap) for
+# `brew install Ax6/tap/showmd` to resolve.
 #
 # On each release, update `version` and `sha256` from the release job summary.
 cask "showmd" do
   version "0.1.0"
   sha256 "REPLACE_WITH_RELEASE_SHA256"
 
-  url "https://github.com/aaronrusso/showmd/releases/download/v#{version}/showmd-#{version}-universal.app.tar.gz"
+  url "https://github.com/Ax6/showmd/releases/download/v#{version}/showmd-#{version}-universal.app.tar.gz"
   name "showmd"
   desc "Lightweight, ultra-fast Markdown reader and editor"
-  homepage "https://github.com/aaronrusso/showmd"
+  homepage "https://github.com/Ax6/showmd"
 
   livecheck do
     url :url
