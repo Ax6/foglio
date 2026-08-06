@@ -6,7 +6,7 @@
 #
 # On each release, update `version` and `sha256` from the release job summary.
 cask "foglio" do
-  version "0.2.0"
+  version "0.3.0"
   sha256 "REPLACE_WITH_RELEASE_SHA256"
 
   url "https://github.com/Ax6/foglio/releases/download/v#{version}/foglio-#{version}-universal.app.tar.gz"
