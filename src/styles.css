@@ -16,6 +16,8 @@
      measure below that makes every such line soft-wrap with a short orphan
      beneath it — worse than sitting slightly wide. */
   --measure: 36rem;
+  /* Smallest breathing room at either edge before centring takes over. */
+  --gutter: 1.75rem;
 
   --bg: #fbfaf8;
   --fg: #1f2024;
@@ -227,18 +229,11 @@ body {
   padding: 0 0.85em;
 }
 
-/* Table rows opt out of the measure and out of wrapping: a wrapped row breaks
-   column alignment, because no two rows wrap at the same column. They share one
-   left edge — aligned with where prose starts — so the columns line up; letting
-   each row centre itself would stagger them, since rows differ in width. */
+/* Only the look of a table row lives here; its layout is in the editor theme,
+   which is the only stylesheet whose selectors outrank CodeMirror's own. */
 .cm-md-table-line {
   font-family: var(--font-mono);
   font-size: 0.88em;
-  max-width: none;
-  width: max-content;
-  white-space: pre;
-  margin-left: max(0px, calc((100% - var(--measure)) / 2));
-  margin-right: 0;
 }
 
 /* ---------- code block tokens ---------- */

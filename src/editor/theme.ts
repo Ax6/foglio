@@ -59,16 +59,43 @@ export const editorTheme = EditorView.theme({
   // needs (see .cm-md-table-line). Constraining .cm-content instead would force
   // tables to wrap, and a wrapped row breaks column alignment for the whole
   // table because no two rows wrap at the same column.
+  // No horizontal padding: each line positions itself, because the content box
+  // grows to fit the widest table and anything measured against it would drift.
   ".cm-content": {
-    padding: "3rem 1.75rem 40vh",
+    padding: "3rem 0 40vh",
     maxWidth: "none",
     caretColor: "var(--caret)",
   },
+  // Offsets are measured from the viewport, never from the content box. A table
+  // wider than the window makes the content box wider than the window too, and
+  // auto margins would then centre every prose line inside that oversized box —
+  // pushing the text off to the right. The editor fills the window in this app,
+  // so 100vw is the width to centre within.
   ".cm-line": {
     padding: "0",
     maxWidth: "var(--measure)",
-    marginLeft: "auto",
-    marginRight: "auto",
+    marginLeft: "max(var(--gutter), calc((100vw - var(--measure)) / 2))",
+    marginRight: "0",
+  },
+
+  // Table layout has to live in the theme rather than in styles.css: CodeMirror
+  // prefixes these selectors with its generated theme class, so `.cm-line` there
+  // is a two-class selector that outranks a single-class rule in a plain
+  // stylesheet. Layout for table rows would silently lose to `margin: auto`
+  // above — which centres each row on its own width and staggers the columns.
+  //
+  // A row never wraps, and every row of one table shares an offset derived from
+  // that table's widest row (--table-ch, set by the live-preview plugin). While
+  // the table fits the measure the offset matches the prose; once it is wider it
+  // centres in the full window, spending the margins instead of scrolling early;
+  // wider than the window, it clamps to zero and scrolls.
+  ".cm-line.cm-md-table-line": {
+    maxWidth: "none",
+    width: "max-content",
+    whiteSpace: "pre",
+    marginLeft:
+      "max(var(--gutter), calc((100vw - max(var(--measure), var(--table-ch, 0) * 1ch)) / 2))",
+    marginRight: "0",
   },
   "&.cm-focused .cm-cursor": { borderLeftColor: "var(--caret)", borderLeftWidth: "2px" },
   ".cm-selectionBackground, ::selection": { backgroundColor: "var(--selection)" },

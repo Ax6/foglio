@@ -17,8 +17,29 @@ const INLINE_CODE = Decoration.mark({ class: "cm-md-inline-code" });
 const LINE = {
   quote: Decoration.line({ class: "cm-md-quote-line" }),
   code: Decoration.line({ class: "cm-md-code-line" }),
-  table: Decoration.line({ class: "cm-md-table-line" }),
 };
+
+/**
+ * A table row carries its table's widest row, in characters, so CSS can decide
+ * how far left to pull the block: aligned with the prose while it fits the
+ * measure, and centred in the whole window once it does not. Rows are monospace,
+ * so a character count converts to a width exactly via `ch`.
+ *
+ * Cached because every row of every table asks for one on each rebuild, and an
+ * identical decoration lets CodeMirror reuse the DOM.
+ */
+const tableLines = new Map<number, Decoration>();
+function tableLine(widest: number): Decoration {
+  let deco = tableLines.get(widest);
+  if (!deco) {
+    deco = Decoration.line({
+      class: "cm-md-table-line",
+      attributes: { style: `--table-ch:${widest}` },
+    });
+    tableLines.set(widest, deco);
+  }
+  return deco;
+}
 
 const BULLET = Decoration.replace({ widget: new BulletWidget() });
 const RULE = Decoration.replace({ widget: new RuleWidget() });
@@ -177,9 +198,18 @@ function build(view: EditorView): Built {
             lineClass(node.from, node.to, LINE.code);
             break;
 
-          case "Table":
-            lineClass(node.from, node.to, LINE.table);
+          case "Table": {
+            // Measured across the entire table, not just its visible rows, or
+            // the offset would shift as the table scrolls into view.
+            const first = doc.lineAt(node.from).number;
+            const last = doc.lineAt(node.to).number;
+            let widest = 0;
+            for (let n = first; n <= last; n++) {
+              widest = Math.max(widest, doc.line(n).text.length);
+            }
+            lineClass(node.from, node.to, tableLine(widest));
             break;
+          }
 
           case "TableDelimiter":
             decorations.push(DIM.range(node.from, node.to));
