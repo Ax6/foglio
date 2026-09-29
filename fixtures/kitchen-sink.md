@@ -87,8 +87,17 @@ A fence with no language at all.
 | Element | Rendered | Notes |
 | ------- | -------- | ----- |
 | Heading | yes | scaled by level |
-| Table | monospace | widgets are v2 |
+| Table | laid out | source on click |
 | Image | no | v1 leaves raw |
+
+A wide table, with inline markup, alignment, an empty cell and an escaped pipe:
+
+| Module | Role | Hot path | Notes |
+| :--- | :--- | :---: | ---: |
+| `live-preview.ts` | Conceals and reveals Markdown syntax as the caret moves | yes | Only walks the lines on screen, so document size barely affects typing cost |
+| `table-view.ts` | Renders tables as **laid-out tables** until the caret enters one | no | Parses each table on its own, and only once it scrolls into view |
+| `tables.ts` | Realigns pipes when the caret leaves a table | | Honours `:---:` and `---:` markers; `a \| b` stays in one cell |
+| [`windows.rs`](./src-tauri/src/windows.rs) | The single funnel every file-open route leads into | no | *Rust side* |
 
 ## Long paragraph
 

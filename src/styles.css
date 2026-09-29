@@ -11,11 +11,12 @@
 :root[data-theme="light"] {
   --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
   --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
-  /* ~80 characters at the body size. The comfortable range for prose is
-     45–75, but Markdown source is conventionally hard-wrapped at 80, and a
-     measure below that makes every such line soft-wrap with a short orphan
-     beneath it — worse than sitting slightly wide. */
-  --measure: 36rem;
+  /* ~100 characters at the body size. Wide enough that source hard-wrapped at
+     80 never soft-wraps. */
+  --measure: 46rem;
+  /* How far a rendered table may widen, centred on the prose, before its cells
+     wrap. */
+  --measure-wide: 62rem;
   /* Smallest breathing room at either edge before centring takes over. */
   --gutter: 1.75rem;
 
@@ -110,18 +111,18 @@ body {
 }
 
 .md-h1 {
-  font-size: 1.95em;
+  font-size: 1.75em;
   letter-spacing: -0.025em;
 }
 .md-h2 {
-  font-size: 1.55em;
+  font-size: 1.4em;
   letter-spacing: -0.02em;
 }
 .md-h3 {
-  font-size: 1.28em;
+  font-size: 1.18em;
 }
 .md-h4 {
-  font-size: 1.12em;
+  font-size: 1.05em;
 }
 .md-h5 {
   font-size: 1em;
@@ -182,12 +183,14 @@ body {
   color: var(--fg-soft);
 }
 
-/* The blank source lines around a rule already supply the breathing room. */
+/* Inline so the rule sits mid-line in one ordinary line box. A block here
+   would split the line around it into two. */
 .cm-md-rule {
-  display: block;
+  display: inline-block;
+  width: 100%;
   height: 0;
   border-top: 1px solid var(--rule);
-  margin: 0.6em 0 0;
+  vertical-align: middle;
 }
 
 .cm-md-task {
@@ -219,14 +222,19 @@ body {
 
 .cm-md-quote-line {
   border-left: 3px solid var(--quote-bar);
-  padding-left: 0.85em;
 }
 
 .cm-md-code-line {
   background: var(--code-bg);
   font-family: var(--font-mono);
-  font-size: 0.9em;
-  padding: 0 0.85em;
+  font-size: 0.88em;
+}
+
+.cm-md-fence-label {
+  color: var(--fg-soft);
+  font-family: var(--font-body);
+  font-size: 0.82em;
+  letter-spacing: 0.02em;
 }
 
 /* Only the look of a table row lives here; its layout is in the editor theme,
@@ -234,6 +242,71 @@ body {
 .cm-md-table-line {
   font-family: var(--font-mono);
   font-size: 0.88em;
+}
+
+/* A rendered table spans the window so it can centre on the prose axis. It
+   starts at the measure, widens toward --measure-wide as its content asks,
+   then wraps its cells, and scrolls only when even wrapped cells won't fit. */
+.cm-md-table {
+  max-width: 100vw;
+  padding: 0.3em var(--gutter);
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.cm-md-table-scroll {
+  width: -webkit-fit-content;
+  width: fit-content;
+  min-width: min(var(--measure), 100%);
+  max-width: min(var(--measure-wide), 100%);
+  margin: 0 auto;
+  overflow-x: auto;
+}
+
+.cm-md-table table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  font-size: 0.93em;
+  line-height: 1.45;
+}
+
+.cm-md-table th,
+.cm-md-table td {
+  padding: 0.42em 0.8em;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+  cursor: text;
+}
+
+.cm-md-table th {
+  background: var(--panel);
+  font-weight: 620;
+}
+
+/* Identifiers and paths read wrong when broken at a hyphen. */
+.cm-md-table code {
+  white-space: nowrap;
+}
+
+.cm-md-table tr > :last-child {
+  border-right: 0;
+}
+
+.cm-md-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.cm-md-table thead th:first-child {
+  border-top-left-radius: 7px;
+}
+
+.cm-md-table thead th:last-child {
+  border-top-right-radius: 7px;
 }
 
 /* ---------- code block tokens ---------- */

@@ -41,14 +41,14 @@ export const markdownHighlight = HighlightStyle.define([
 export const editorTheme = EditorView.theme({
   "&": {
     height: "100%",
-    fontSize: "15.5px",
+    fontSize: "15px",
     backgroundColor: "var(--bg)",
     color: "var(--fg)",
   },
   "&.cm-focused": { outline: "none" },
   ".cm-scroller": {
     fontFamily: "var(--font-body)",
-    lineHeight: "1.65",
+    lineHeight: "1.6",
     overflowY: "auto",
     // Tables are allowed to be wider than the sheet, so the scroller has to be
     // able to reach them.
@@ -73,10 +73,31 @@ export const editorTheme = EditorView.theme({
   // so 100vw is the width to centre within.
   ".cm-line": {
     padding: "0",
-    maxWidth: "var(--measure)",
+    maxWidth: "min(var(--measure), calc(100vw - 2 * var(--gutter)))",
     marginLeft: "max(var(--gutter), calc((100vw - var(--measure)) / 2))",
     marginRight: "0",
   },
+
+  // Vertical rhythm comes from the elements. A blank source line shrinks to a
+  // paragraph gap, and a heading carries its own space above. Like table layout
+  // below, line spacing has to live in the theme to outrank `.cm-line` above.
+  //
+  // A blank line's height is fixed too, because a concealed `>` leaves inline
+  // widget buffers behind that would hold it open at full height.
+  ".cm-line.cm-md-blank": { lineHeight: "0.6em", height: "0.6em" },
+  ".cm-line.cm-md-h1-line": { paddingTop: "0.9em" },
+  ".cm-line.cm-md-h2-line": { paddingTop: "0.75em" },
+  ".cm-line.cm-md-h3-line": { paddingTop: "0.5em" },
+  ".cm-line.cm-md-h4-line": { paddingTop: "0.35em" },
+  ".cm-line.cm-md-h5-line": { paddingTop: "0.35em" },
+  ".cm-line.cm-md-h6-line": { paddingTop: "0.35em" },
+  ".cm-line.cm-md-quote-line": { paddingLeft: "0.9em" },
+  ".cm-line.cm-md-code-line": { padding: "0 1.1em" },
+  ".cm-line.cm-md-code-first": { borderRadius: "6px 6px 0 0" },
+  ".cm-line.cm-md-code-last": { borderRadius: "0 0 6px 6px" },
+  ".cm-line.cm-md-code-first.cm-md-code-last": { borderRadius: "6px" },
+  ".cm-line.cm-md-fence": { lineHeight: "0.9em" },
+  ".cm-line.cm-md-fence-label-line": { lineHeight: "1.9em" },
 
   // Table layout has to live in the theme rather than in styles.css: CodeMirror
   // prefixes these selectors with its generated theme class, so `.cm-line` there

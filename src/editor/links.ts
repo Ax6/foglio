@@ -4,6 +4,7 @@ import { EditorView } from "@codemirror/view";
 import { openUrl } from "@tauri-apps/plugin-opener";
 
 import { openPath } from "../ipc";
+import { tableSourcePos } from "./table-view";
 
 const ABSOLUTE = /^[a-z][a-z0-9+.-]*:/i;
 
@@ -50,7 +51,9 @@ export function linkClicks(docPath: () => string | null) {
   return EditorView.domEventHandlers({
     mousedown(event, view) {
       if (!event.metaKey || event.button !== 0) return false;
-      const pos = view.posAtCoords({ x: event.clientX, y: event.clientY });
+      const pos =
+        tableSourcePos(view, event.target) ??
+        view.posAtCoords({ x: event.clientX, y: event.clientY });
       if (pos == null) return false;
       const target = linkTargetAt(view, pos);
       if (!target) return false;

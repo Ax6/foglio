@@ -34,7 +34,7 @@ function tableAt(state: EditorState, pos: number): TableRange | null {
  * Split a row into cell texts. Pipes escaped as `\|` belong to the cell, so the
  * split has to respect the backslash rather than using a plain split.
  */
-function splitCells(row: string): { indent: string; cells: string[] } {
+export function splitCells(row: string): { indent: string; cells: string[] } {
   const indent = row.match(/^\s*/)?.[0] ?? "";
   let rest = row.slice(indent.length);
   if (rest.startsWith("|")) rest = rest.slice(1);
@@ -60,9 +60,9 @@ function splitCells(row: string): { indent: string; cells: string[] } {
 
 const DELIMITER_ROW = /^\s*\|?[\s:|-]*-[\s:|-]*\|?\s*$/;
 
-type Align = "left" | "right" | "center" | "none";
+export type Align = "left" | "right" | "center" | "none";
 
-function alignOf(cell: string): Align {
+export function alignOf(cell: string): Align {
   const left = cell.startsWith(":");
   const right = cell.endsWith(":");
   if (left && right) return "center";

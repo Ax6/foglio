@@ -8,7 +8,7 @@ import {
   ViewUpdate,
 } from "@codemirror/view";
 
-import { BulletWidget, CheckboxWidget, RuleWidget } from "./widgets";
+import { BulletWidget, CheckboxWidget, FenceLabelWidget, RuleWidget } from "./widgets";
 
 const HIDE = Decoration.replace({});
 const DIM = Decoration.mark({ class: "cm-md-dim" });
@@ -17,7 +17,26 @@ const INLINE_CODE = Decoration.mark({ class: "cm-md-inline-code" });
 const LINE = {
   quote: Decoration.line({ class: "cm-md-quote-line" }),
   code: Decoration.line({ class: "cm-md-code-line" }),
+  codeFirst: Decoration.line({ class: "cm-md-code-first" }),
+  codeLast: Decoration.line({ class: "cm-md-code-last" }),
+  fence: Decoration.line({ class: "cm-md-fence" }),
+  fenceLabel: Decoration.line({ class: "cm-md-fence-label-line" }),
+  blank: Decoration.line({ class: "cm-md-blank" }),
 };
+
+const HEADING_LINE = [1, 2, 3, 4, 5, 6].map((n) =>
+  Decoration.line({ class: `cm-md-heading-line cm-md-h${n}-line` }),
+);
+
+const fenceLabels = new Map<string, Decoration>();
+function fenceLabel(lang: string): Decoration {
+  let deco = fenceLabels.get(lang);
+  if (!deco) {
+    deco = Decoration.replace({ widget: new FenceLabelWidget(lang) });
+    fenceLabels.set(lang, deco);
+  }
+  return deco;
+}
 
 /**
  * A table row carries its table's widest row, in characters, so CSS can decide
@@ -48,6 +67,7 @@ const UNCHECKED = Decoration.replace({ widget: new CheckboxWidget(false) });
 
 const ATX_HEADING = /^ATXHeading[1-6]$/;
 const PLAIN_BULLET = /^[-*+]$/;
+const QUOTE_ONLY = /^\s*(?:>\s*)+$/;
 
 interface Built {
   decorations: DecorationSet;
@@ -91,11 +111,27 @@ function build(view: EditorView): Built {
       }
     };
 
+    // Blank lines inside code are content, so they keep their height.
+    const code: [number, number][] = [];
+
     syntaxTree(state).iterate({
       from: visible.from,
       to: visible.to,
       enter: (node) => {
         switch (node.name) {
+          case "ATXHeading1":
+          case "ATXHeading2":
+          case "ATXHeading3":
+          case "ATXHeading4":
+          case "ATXHeading5":
+          case "ATXHeading6":
+          case "SetextHeading1":
+          case "SetextHeading2": {
+            const level = Number(node.name.slice(-1));
+            decorations.push(HEADING_LINE[level - 1].range(doc.lineAt(node.from).from));
+            break;
+          }
+
           // `## ` — hidden with its trailing space so text aligns left.
           case "HeaderMark": {
             const parent = node.node.parent;
@@ -194,9 +230,26 @@ function build(view: EditorView): Built {
             break;
 
           case "FencedCode":
-          case "CodeBlock":
+          case "CodeBlock": {
+            const first = doc.lineAt(node.from);
+            const last = doc.lineAt(node.to);
             lineClass(node.from, node.to, LINE.code);
+            decorations.push(LINE.codeFirst.range(first.from), LINE.codeLast.range(last.from));
+            code.push([first.from, last.to]);
+            if (node.name === "CodeBlock" || revealed(first.from, last.to)) break;
+
+            // Fences recede into the block's padding. The opening one keeps the
+            // language as a label; an unclosed block has no closing fence.
+            const info = node.node.getChild("CodeInfo");
+            const lang = info ? doc.sliceString(info.from, info.to) : "";
+            conceal(first.from, first.to, lang ? fenceLabel(lang) : HIDE);
+            decorations.push((lang ? LINE.fenceLabel : LINE.fence).range(first.from));
+            if (node.node.getChildren("CodeMark").length > 1) {
+              conceal(last.from, last.to);
+              decorations.push(LINE.fence.range(last.from));
+            }
             break;
+          }
 
           case "Table": {
             // Measured across the entire table, not just its visible rows, or
@@ -217,6 +270,17 @@ function build(view: EditorView): Built {
         }
       },
     });
+
+    // A blank source line only separates blocks, so it shrinks to a gap. A
+    // quote line holding only `>` does too, until the caret reveals its marker.
+    for (let pos = visible.from; pos <= visible.to; ) {
+      const line = doc.lineAt(pos);
+      pos = line.to + 1;
+      const blank = !line.text.trim();
+      if (!blank && !(QUOTE_ONLY.test(line.text) && !revealed(line.from, line.to))) continue;
+      if (code.some(([from, to]) => line.from >= from && line.from <= to)) continue;
+      decorations.push(LINE.blank.range(line.from));
+    }
   }
 
   return {

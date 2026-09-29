@@ -72,19 +72,20 @@ These are native menu accelerators rather than editor keybindings — macOS
 resolves them before the webview sees the keystroke, so they work regardless of
 what has focus inside the window.
 
-Tables render as aligned monospace text rather than as laid-out tables, and are
-allowed to be wider than the text measure. A row never wraps — no two rows wrap at
-the same column, so one wrapped row destroys the alignment of the whole table.
+Tables render as laid-out tables, with inline formatting and `:---:` / `---:`
+alignment. A table starts at the width of the prose and widens, centred on it, as
+its content asks. Past `--measure-wide` its cells wrap, and it scrolls only when
+even wrapped cells cannot fit the window.
 
-Instead a table takes as much width as it needs. While it fits the measure it sits
-with the prose; once it is wider it centres in the full window, spending the
-margins rather than scrolling while space is still going unused; wider than the
-window it starts at the left edge and scrolls. Every row of a table shares one
-offset, derived from its widest row, so the columns stay aligned.
+Clicking a cell, or arrowing onto the table, swaps in the Markdown source with the
+caret in place. The source rows never wrap, because no two rows wrap at the same
+column and one wrapped row breaks the alignment of the whole table. Cells do not
+have to be padded by hand. Type them loosely and the pipes are realigned as soon
+as the caret leaves the table. Images are left as source text.
 
-Cells do not have to be padded by hand. Type them loosely and the pipes are
-realigned as soon as the caret leaves the table, honouring `:---:` and `---:`
-alignment markers. Images are left as source text.
+Blank source lines shrink to paragraph gaps, and headings carry their own space
+above, so a document reads with the rhythm of rendered Markdown rather than the
+line-for-line height of its source.
 
 ## Development
 
@@ -115,7 +116,8 @@ python3 -c "b=open('fixtures/kitchen-sink.md').read(); open('fixtures/large.md',
 | Path | Role |
 | --- | --- |
 | `src/editor/live-preview.ts` | Conceals and reveals Markdown syntax — the core of the editing feel |
-| `src/editor/theme.ts` | Highlight tags mapped to CSS classes |
+| `src/editor/table-view.ts` | Renders tables, and swaps in their source when the caret enters |
+| `src/editor/theme.ts` | Highlight tags mapped to CSS classes, and line layout |
 | `src/styles.css` | All colours and typography, keyed on `data-theme` |
 | `src/appearance.ts` | Resolves the chosen mode, following the system when asked to |
 | `src-tauri/src/windows.rs` | The single funnel all four file-open routes lead into |

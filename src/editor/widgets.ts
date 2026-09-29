@@ -60,6 +60,28 @@ export class BulletWidget extends WidgetType {
   }
 }
 
+/** A fenced block's language, standing in for its concealed opening fence. */
+export class FenceLabelWidget extends WidgetType {
+  constructor(readonly lang: string) {
+    super();
+  }
+
+  eq(other: FenceLabelWidget) {
+    return other.lang === this.lang;
+  }
+
+  toDOM() {
+    const el = document.createElement("span");
+    el.className = "cm-md-fence-label";
+    el.textContent = this.lang;
+    return el;
+  }
+
+  ignoreEvent() {
+    return false;
+  }
+}
+
 export class RuleWidget extends WidgetType {
   eq() {
     return true;

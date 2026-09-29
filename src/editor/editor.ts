@@ -16,6 +16,7 @@ import {
 
 import { linkClicks } from "./links";
 import { livePreview } from "./live-preview";
+import { renderedTables } from "./table-view";
 import { tableEditing } from "./tables";
 import { editorTheme, markdownHighlight } from "./theme";
 
@@ -48,6 +49,7 @@ export function createEditor(options: EditorOptions): EditorView {
     }),
     syntaxHighlighting(markdownHighlight),
     livePreview,
+    renderedTables,
     tableEditing,
     editorTheme,
     linkClicks(options.docPath),
