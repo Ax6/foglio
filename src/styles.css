@@ -27,11 +27,13 @@
   --rule: #e2ded6;
   --accent: #1f6f8b;
   --caret: #1f2024;
-  --selection: #cfe3ea;
+  --selection: #c4dfea;
   --panel: #f2efe9;
   --match: #f6e6a8;
   --match-active: #eccf5c;
-  --code-bg: #f2efe9;
+  /* A tint rather than a colour. The selection is drawn beneath the text, and
+     an opaque background would hide it. Over the page this reads as #f2efe9. */
+  --code-bg: rgba(100, 66, 0, 0.06);
   --quote-bar: #dcd7cd;
   --shadow: rgba(31, 32, 36, 0.16);
 
@@ -55,11 +57,12 @@
   --rule: #2c2e33;
   --accent: #6fb6cf;
   --caret: #e6e4df;
-  --selection: #2c4551;
+  --selection: #2e5264;
   --panel: #1e2024;
   --match: #4a411f;
   --match-active: #7a6a2a;
-  --code-bg: #1e2024;
+  /* Reads as #1e2024 over the page. */
+  --code-bg: rgba(182, 203, 226, 0.05);
   --quote-bar: #3a3d44;
   --shadow: rgba(0, 0, 0, 0.5);
 
@@ -284,7 +287,7 @@ body {
 }
 
 .cm-md-table th {
-  background: var(--panel);
+  background: var(--code-bg);
   font-weight: 620;
 }
 

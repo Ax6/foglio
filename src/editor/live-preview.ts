@@ -75,7 +75,7 @@ interface Built {
 }
 
 /**
- * Rewrites markdown syntax out of view, except where the selection sits. Only
+ * Rewrites markdown syntax out of view, except where the caret sits. Only
  * the visible ranges are walked, so document size does not affect typing cost.
  */
 function build(view: EditorView): Built {
@@ -86,9 +86,13 @@ function build(view: EditorView): Built {
   const decorations: Range<Decoration>[] = [];
   const atomic: Range<Decoration>[] = [];
 
-  /** Is the caret or a selection inside the element being rendered? */
+  /**
+   * Is the caret, or the fixed end of a selection, inside the element being
+   * rendered? The moving end reveals nothing, so a selection being dragged
+   * never shifts text under the pointer.
+   */
   const revealed = (from: number, to: number) =>
-    ranges.some((r) => r.from <= to && r.to >= from);
+    ranges.some((r) => r.anchor >= from && r.anchor <= to);
 
   const lineSpan = (from: number, to: number): [number, number] => [
     doc.lineAt(from).from,

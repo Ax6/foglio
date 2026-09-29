@@ -16,6 +16,7 @@ import {
 
 import { linkClicks } from "./links";
 import { livePreview } from "./live-preview";
+import { selectionLayer } from "./selection";
 import { renderedTables } from "./table-view";
 import { tableEditing } from "./tables";
 import { editorTheme, markdownHighlight } from "./theme";
@@ -32,6 +33,7 @@ export function createEditor(options: EditorOptions): EditorView {
   const extensions: Extension[] = [
     history(),
     drawSelection(),
+    selectionLayer,
     dropCursor(),
     rectangularSelection(),
     crosshairCursor(),

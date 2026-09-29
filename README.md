@@ -117,6 +117,7 @@ python3 -c "b=open('fixtures/kitchen-sink.md').read(); open('fixtures/large.md',
 | --- | --- |
 | `src/editor/live-preview.ts` | Conceals and reveals Markdown syntax — the core of the editing feel |
 | `src/editor/table-view.ts` | Renders tables, and swaps in their source when the caret enters |
+| `src/editor/selection.ts` | Draws the selection highlight inside the text column |
 | `src/editor/theme.ts` | Highlight tags mapped to CSS classes, and line layout |
 | `src/styles.css` | All colours and typography, keyed on `data-theme` |
 | `src/appearance.ts` | Resolves the chosen mode, following the system when asked to |

@@ -119,8 +119,13 @@ export const editorTheme = EditorView.theme({
     marginRight: "0",
   },
   "&.cm-focused .cm-cursor": { borderLeftColor: "var(--caret)", borderLeftWidth: "2px" },
-  ".cm-selectionBackground, ::selection": { backgroundColor: "var(--selection)" },
-  "&.cm-focused .cm-selectionBackground": { backgroundColor: "var(--selection)" },
+
+  // selection.ts draws the highlight in place of CodeMirror's own layer.
+  ".cm-selectionLayer": { display: "none" },
+  ".cm-md-selection": { backgroundColor: "var(--selection)" },
+  "&:not(.cm-focused) .cm-md-selection": { opacity: "0.55" },
+  "::selection": { backgroundColor: "var(--selection)" },
+  ".cm-md-table ::selection": { backgroundColor: "transparent" },
   ".cm-panels": {
     backgroundColor: "var(--panel)",
     color: "var(--fg)",

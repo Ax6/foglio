@@ -91,11 +91,15 @@ function rescanEdited(spans: Span[], tr: Transaction): Span[] {
     .filter((s, i, all) => i === 0 || s.from !== all[i - 1].from);
 }
 
+/**
+ * A table shows its source only while the caret, or the fixed end of a
+ * selection, is inside it. A selection dragged across it leaves it rendered.
+ */
 function decorate(state: EditorState, spans: Span[]): DecorationSet {
   const { ranges } = state.selection;
   const widgets: Range<Decoration>[] = [];
   for (const { from, to } of spans) {
-    if (ranges.some((r) => r.from <= to && r.to >= from)) continue;
+    if (ranges.some((r) => r.anchor >= from && r.anchor <= to)) continue;
     const widget = new TableWidget(state.doc.sliceString(from, to));
     widgets.push(Decoration.replace({ widget, block: true }).range(from, to));
   }
