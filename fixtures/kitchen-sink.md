@@ -29,6 +29,14 @@ Plain text with **bold**, *italic*, ***both at once***, ~~struck through~~, and
 2. Second ordered item
 3. Third ordered item
 
+- State lives on the [app-flood project](https://example.com). Its Status field
+  runs Idea → Building → Review → Approved → Submitted → Live, or Rejected. Read and change it with `.flood/bin/state`.
+- `.flood/bin/notify` pushes a message to the owner's phone. It reads its token from `~/.config/app-flood/env`.
+  - A nested item long enough to wrap onto a second line, so its continuation lines up under its own text.
+
+9. An ordered item just short of two digits
+10. A two-digit sibling, whose text still lines up with the item above when it wraps onto a second line.
+
 ## Tasks
 
 - [ ] Unchecked task

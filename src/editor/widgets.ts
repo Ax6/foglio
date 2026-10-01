@@ -44,14 +44,18 @@ export class CheckboxWidget extends WidgetType {
 }
 
 export class BulletWidget extends WidgetType {
-  eq() {
-    return true;
+  constructor(readonly glyph: string) {
+    super();
+  }
+
+  eq(other: BulletWidget) {
+    return other.glyph === this.glyph;
   }
 
   toDOM() {
     const el = document.createElement("span");
     el.className = "cm-md-bullet";
-    el.textContent = "•";
+    el.textContent = this.glyph;
     return el;
   }
 

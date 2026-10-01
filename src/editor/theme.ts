@@ -73,25 +73,44 @@ export const editorTheme = EditorView.theme({
   // so 100vw is the width to centre within.
   ".cm-line": {
     padding: "0",
+    paddingTop: "calc(var(--heading-above, 0px) + var(--gap-above, 0px))",
     maxWidth: "min(var(--measure), calc(100vw - 2 * var(--gutter)))",
     marginLeft: "max(var(--gutter), calc((100vw - var(--measure)) / 2))",
     marginRight: "0",
   },
 
-  // Vertical rhythm comes from the elements. A blank source line shrinks to a
-  // paragraph gap, and a heading carries its own space above. Like table layout
-  // below, line spacing has to live in the theme to outrank `.cm-line` above.
+  // Vertical rhythm comes from the elements. Blocks sit one block gap apart,
+  // whether a blank source line or the live-preview plugin puts it there. List
+  // items sit a smaller item gap apart, and a heading adds its own space above.
+  // Like table layout below, line spacing has to live in the theme to outrank
+  // `.cm-line` above, which sums the space a line asks for.
   //
   // A blank line's height is fixed too, because a concealed `>` leaves inline
   // widget buffers behind that would hold it open at full height.
-  ".cm-line.cm-md-blank": { lineHeight: "0.6em", height: "0.6em" },
-  ".cm-line.cm-md-h1-line": { paddingTop: "0.9em" },
-  ".cm-line.cm-md-h2-line": { paddingTop: "0.75em" },
-  ".cm-line.cm-md-h3-line": { paddingTop: "0.5em" },
-  ".cm-line.cm-md-h4-line": { paddingTop: "0.35em" },
-  ".cm-line.cm-md-h5-line": { paddingTop: "0.35em" },
-  ".cm-line.cm-md-h6-line": { paddingTop: "0.35em" },
+  ".cm-line.cm-md-blank": { lineHeight: "var(--block-gap)", height: "var(--block-gap)" },
+  ".cm-line.cm-md-gap-above": { "--gap-above": "var(--block-gap)" },
+  ".cm-line.cm-md-gap-below": { paddingBottom: "var(--block-gap)" },
+  ".cm-line.cm-md-list-gap": { "--gap-above": "var(--item-gap)" },
+  ".cm-line.cm-md-h1-line": { "--heading-above": "0.9em" },
+  ".cm-line.cm-md-h2-line": { "--heading-above": "0.75em" },
+  ".cm-line.cm-md-h3-line": { "--heading-above": "0.5em" },
+  ".cm-line.cm-md-h4-line": { "--heading-above": "0.35em" },
+  ".cm-line.cm-md-h5-line": { "--heading-above": "0.35em" },
+  ".cm-line.cm-md-h6-line": { "--heading-above": "0.35em" },
   ".cm-line.cm-md-quote-line": { paddingLeft: "0.9em" },
+
+  // A list line indents one gutter per level of nesting. An item's first line
+  // pulls its prefix box back into that indent, so the text starts at the same
+  // column on every line of the item.
+  ".cm-line.cm-md-list-line": {
+    paddingLeft: "calc(var(--list-depth) * var(--list-gutter))",
+  },
+  ".cm-line.cm-md-quote-line.cm-md-list-line": {
+    paddingLeft: "calc(0.9em + var(--list-depth) * var(--list-gutter))",
+  },
+  ".cm-line.cm-md-list-hang": {
+    textIndent: "calc(var(--list-depth) * var(--list-gutter) * -1)",
+  },
   ".cm-line.cm-md-code-line": { padding: "0 1.1em" },
   ".cm-line.cm-md-code-first": { borderRadius: "6px 6px 0 0" },
   ".cm-line.cm-md-code-last": { borderRadius: "0 0 6px 6px" },

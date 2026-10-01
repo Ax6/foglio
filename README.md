@@ -83,9 +83,14 @@ column and one wrapped row breaks the alignment of the whole table. Cells do not
 have to be padded by hand. Type them loosely and the pipes are realigned as soon
 as the caret leaves the table. Images are left as source text.
 
-Blank source lines shrink to paragraph gaps, and headings carry their own space
-above, so a document reads with the rhythm of rendered Markdown rather than the
-line-for-line height of its source.
+A list item hangs its bullet or number in the indent, so wrapped and continuation
+lines start under the item's text. Revealing the marker's source never moves that
+text.
+
+Blocks sit half a line apart whether or not a blank source line separates them,
+list items sit a smaller step apart, and headings carry their own space above. A
+document reads with the rhythm of rendered Markdown rather than the line-for-line
+height of its source.
 
 ## Development
 

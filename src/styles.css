@@ -19,6 +19,12 @@
   --measure-wide: 62rem;
   /* Smallest breathing room at either edge before centring takes over. */
   --gutter: 1.75rem;
+  /* How far each level of a list indents its text. */
+  --list-gutter: 1.35em;
+  /* Space between blocks, half a line, and between list items. A block gap
+     several times an item gap keeps a list reading as one group. */
+  --block-gap: 0.8em;
+  --item-gap: 0.25em;
 
   --bg: #fbfaf8;
   --fg: #1f2024;
@@ -180,6 +186,25 @@ body {
 .cm-md-dim {
   color: var(--syntax);
   font-weight: 400;
+}
+
+/* A list item's indentation and marker, right-aligned in a box that ends where
+   the text starts. The text column holds whatever the marker is or shows. A
+   prefix wider than its indent hangs into the margin, like an outside marker.
+   `pre` keeps the trailing space, which pre-wrap would let hang. */
+.cm-md-list-prefix {
+  display: inline-block;
+  width: calc(var(--list-depth) * var(--list-gutter) + 2em);
+  margin-left: -2em;
+  text-indent: 0;
+  text-align: right;
+  white-space: pre;
+}
+
+.cm-md-list-ordered,
+.cm-md-list-ordered .md-syntax {
+  color: var(--fg-soft);
+  font-variant-numeric: tabular-nums;
 }
 
 .cm-md-bullet {
